@@ -54,6 +54,8 @@ jobs:
             cd "$repo_name"
 
             # 运行 go-critic 并捕获错误输出
+            #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt 2> ../../gocritic-errors-$repo_name.txt || true
+
             go vet  || true
             gocritic check  > ../../gocritic-report-$repo_name.txt 2> ../../gocritic-errors-$repo_name.txt || true
 
@@ -80,12 +82,8 @@ jobs:
           for report_file in gocritic-report-*.txt; do
             if [ -f "$report_file" ]; then
               repo_name=$(basename "$report_file" .txt | sed 's/gocritic-report-//')
-              
-              # 使用完整的仓库路径
-              repo_path=$(grep "$repo_name" ../repo.txt)
-              
               report_content=$(cat "$report_file" || echo "没有生成报告")
-              REPORTS="$REPORTS\n### $repo_path 报告:\n\`\`\`\n$report_content\n\`\`\`"
+              REPORTS="$REPORTS\n### $repo_name 报告:\n\`\`\`\n$report_content\n\`\`\`"
             fi
           done
 
@@ -93,12 +91,9 @@ jobs:
           for error_file in gocritic-errors-*.txt; do
             if [ -f "$error_file" ]; then
               repo_name=$(basename "$error_file" .txt | sed 's/gocritic-errors-//')
-
-              # 使用完整的仓库路径
-              repo_path=$(grep "$repo_name" ../repo.txt)
-
               error_content=$(cat "$error_file" || echo "没有错误")
-              ERRORS="$ERRORS\n### $repo_path 错误:\n\`\`\`\n$error_content\n\`\`\`"
+              #注释掉 ERRORS="$ERRORS\n### $repo_name 错误:\n\`\`\`\n$error_content\n\`\`\`"
+              ERRORS="$ERRORS\n### $report_file 错误:\n\`\`\`\n$error_content\n\`\`\`"
             fi
           done
 
@@ -125,9 +120,9 @@ jobs:
           issue-number: 1
           body: |
             ## Go-Critic 静态分析报告
-            # 以下是 go-critic 发现的问题：
+            #以下是 go-critic 发现的问题：
 
-            # ${{ env.reports }}
+            #${{ env.reports }}
 
             以下是 go-critic 产生的错误：
 
