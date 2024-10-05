@@ -52,17 +52,12 @@ jobs:
             # 克隆仓库
             git clone "$repo" "$repo_name"
             cd "$repo_name"
-            pwd
-            ls
 
-             # 运行 go vet
-            go vet ./...  || true
-            # 运行 go-critic
-            gocritic check
-            gocritic check  -disable offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt
-            #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
-            echo "检测出的内容为"
-            cat ../../gocritic-report-$repo_name.txt
+            # 运行 go-critic 并捕获错误输出
+            #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt 2> ../../gocritic-errors-$repo_name.txt || true
+
+            go vet
+            gocritic check  > ../../gocritic-report-$repo_name.txt 2> ../../gocritic-errors-$repo_name.txt || true
 
             # 返回 repos 目录
             cd ..
@@ -72,41 +67,49 @@ jobs:
       - name: Collect analysis reports
         run: |
           # 将所有 go-critic 报告合并到一个文件中
-          ls gocritic-report-*.txt
-          echo 666
-          realpath gocritic-report-kubeadm.txt
           cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
-          realpath ../gocritic-issues-summary.txt
-          echo 888
+          cat gocritic-errors-*.txt > ../gocritic-errors-summary.txt
         shell: bash
 
       - name: 读取并保存报告内容
         id: get-reports
         run: |
-          # 读取不同文件的内容
-          GO_REPORT=$(cat gocritic-report-go.txt || echo "go.txt 没有生成报告")
-          HELMFILE_REPORT=$(cat gocritic-report-helmfile.txt || echo "helmfile.txt 没有生成报告")
+          # 初始化变量来存储报告和错误信息
+          REPORTS=""
+          ERRORS=""
 
-          # 设置为环境变量
-          echo "go_report<<EOF" >> $GITHUB_ENV
-          echo "$GO_REPORT" >> $GITHUB_ENV
+          # 遍历所有生成的报告文件
+          for report_file in gocritic-report-*.txt; do
+            if [ -f "$report_file" ]; then
+              repo_name=$(basename "$report_file" .txt | sed 's/gocritic-report-//')
+              report_content=$(cat "$report_file" || echo "没有生成报告")
+              REPORTS="$REPORTS\n### $repo_name 报告:\n\`\`\`\n$report_content\n\`\`\`"
+            fi
+          done
+
+          # 遍历所有生成的错误文件
+          for error_file in gocritic-errors-*.txt; do
+            if [ -f "$error_file" ]; then
+              repo_name=$(basename "$error_file" .txt | sed 's/gocritic-errors-//')
+              error_content=$(cat "$error_file" || echo "没有错误")
+              ERRORS="$ERRORS\n### $repo_name 错误:\n\`\`\`\n$error_content\n\`\`\`"
+            fi
+          done
+
+          # 将报告和错误设置为输出变量
+          echo "reports<<EOF" >> $GITHUB_ENV
+          echo -e "$REPORTS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
-          echo "helmfile_report<<EOF" >> $GITHUB_ENV
-          echo "$HELMFILE_REPORT" >> $GITHUB_ENV
+          echo "errors<<EOF" >> $GITHUB_ENV
+          echo -e "$ERRORS" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
       - name: 输出环境变量进行调试
         run: |
-          cat /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile/CONTRIBUTING.md
-          ls /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile
-          echo 123
-          cat /home/runner/work/go-critic-linter/gocritic-issues-summary.txt
-          cat /home/runner/work/go-critic-linter/go-critic-linter/gocritic-report-kubeadm.txt
-          echo 678
-          echo "Go report: ${{ env.go_report }}"
-          echo "Helmfile report: ${{ env.helmfile_report }}"
+          echo "Reports: ${{ env.reports }}"
+          echo "Errors: ${{ env.errors }}"
         shell: bash
 
       - name: Create or update issue with analysis results
@@ -118,12 +121,8 @@ jobs:
             ## Go-Critic 静态分析报告
             以下是 go-critic 发现的问题：
 
-            ### Go 报告:
-            ```
-              为什么没内容?
-            ```
+            ${{ env.reports }}
 
-            ### Helmfile 报告:
-            ```
-            ${{ env.helmfile_report }}
-            ```
+            以下是 go-critic 产生的错误：
+
+            ${{ env.errors }}
