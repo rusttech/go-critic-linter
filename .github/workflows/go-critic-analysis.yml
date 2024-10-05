@@ -67,6 +67,8 @@ jobs:
       - name: Collect analysis reports
         run: |
           # 将所有 go-critic 报告合并到一个文件中
+          ls gocritic-report-*.txt
+          echo 666
           cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
           realpath ../gocritic-issues-summary.txt
           echo 888
