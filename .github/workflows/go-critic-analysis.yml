@@ -54,7 +54,8 @@ jobs:
             cd "$repo_name"
 
             # 运行 go-critic
-            gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
+            gocritic check  -disable offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
+            #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
 
             # 返回 repos 目录
             cd ..
@@ -89,7 +90,7 @@ jobs:
           echo "Go report: ${{ env.go_report }}"
           echo "Helmfile report: ${{ env.helmfile_report }}"
         shell: bash
-        
+
       - name: Create or update issue with analysis results
         uses: peter-evans/create-or-update-comment@v3
         with:
