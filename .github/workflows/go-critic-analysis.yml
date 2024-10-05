@@ -84,6 +84,12 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
         shell: bash
 
+      - name: 输出环境变量进行调试
+        run: |
+          echo "Go report: ${{ env.go_report }}"
+          echo "Helmfile report: ${{ env.helmfile_report }}"
+        shell: bash
+        
       - name: Create or update issue with analysis results
         uses: peter-evans/create-or-update-comment@v3
         with:
