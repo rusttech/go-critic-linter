@@ -1,3 +1,2 @@
-https://github.com/golang/go
-https://github.com/helmfile/helmfile
+https://github.com/go-chi/chi
 https://github.com/kubernetes/kubeadm
