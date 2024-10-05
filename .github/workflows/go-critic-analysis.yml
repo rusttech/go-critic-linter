@@ -98,6 +98,8 @@ jobs:
           ls /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile
           echo 123
           cat /home/runner/work/go-critic-linter/gocritic-issues-summary.txt
+          cat /home/runner/work/go-critic-linter/go-critic-linter/gocritic-report-kubeadm.txt
+          echo 678
           echo "Go report: ${{ env.go_report }}"
           echo "Helmfile report: ${{ env.helmfile_report }}"
         shell: bash
@@ -113,7 +115,7 @@ jobs:
 
             ### Go 报告:
             ```
-            ${{ env.go_report }}
+            ${{ cat /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile/CONTRIBUTING.md }}
             ```
 
             ### Helmfile 报告:
