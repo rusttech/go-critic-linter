@@ -86,5 +86,5 @@ jobs:
             The following issues were found by go-critic:
 
             ```
-            $(cat ../gocritic-issues-summary.txt)
+            $(cat gocritic-report-go.txt)
             ```
