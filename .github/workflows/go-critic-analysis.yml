@@ -56,7 +56,7 @@ jobs:
             ls
 
             # 运行 go-critic
-            gocritic check  -disable offBy1,defaultCaseOrder > gocritic-report-$repo_name.txt
+            gocritic check  -disable offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt 
             #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
 
             # 返回 repos 目录
@@ -68,6 +68,8 @@ jobs:
         run: |
           # 将所有 go-critic 报告合并到一个文件中
           cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
+          realpath ../gocritic-issues-summary.txt
+          echo 888
         shell: bash
 
       - name: 读取并保存报告内容
