@@ -94,7 +94,7 @@ jobs:
           cat /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile/CONTRIBUTING.md
           ls /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile
           echo 123
-          cat /home/runner/work/go-critic-linter/go-critic-linter/repos/go/gocritic-report-go.txt
+          cat /home/runner/work/go-critic-linter/gocritic-issues-summary.txt
           echo "Go report: ${{ env.go_report }}"
           echo "Helmfile report: ${{ env.helmfile_report }}"
         shell: bash
