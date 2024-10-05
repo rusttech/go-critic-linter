@@ -69,6 +69,7 @@ jobs:
           # 将所有 go-critic 报告合并到一个文件中
           ls gocritic-report-*.txt
           echo 666
+          realpath gocritic-report-kubeadm.txt
           cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
           realpath ../gocritic-issues-summary.txt
           echo 888
