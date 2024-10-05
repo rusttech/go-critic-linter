@@ -72,9 +72,9 @@ jobs:
 
       - name: 用于调试
         run: |
+          cat gocritic-report-go.txt
           pwd
           ls
-          cat gocritic-report-go.txt
         shell: bash
 
       - name: Create or update issue with analysis results
