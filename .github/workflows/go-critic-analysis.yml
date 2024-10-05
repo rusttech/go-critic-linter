@@ -92,8 +92,8 @@ jobs:
             if [ -f "$error_file" ]; then
               repo_name=$(basename "$error_file" .txt | sed 's/gocritic-errors-//')
               error_content=$(cat "$error_file" || echo "没有错误")
-              #注释掉 ERRORS="$ERRORS\n### $repo_name 错误:\n\`\`\`\n$error_content\n\`\`\`"
-              ERRORS="$ERRORS\n### $report_file 错误:\n\`\`\`\n$error_content\n\`\`\`"
+              #ERRORS="$ERRORS\n### $repo_name 错误:\n\`\`\`\n$error_content\n\`\`\`"
+              ERRORS="$ERRORS\n### $repo 错误:\n\`\`\`\n$error_content\n\`\`\`"
             fi
           done
 
@@ -119,10 +119,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: 1
           body: |
-            ## Go-Critic 静态分析报告
-            #以下是 go-critic 发现的问题：
+            # Go-Critic 静态分析报告
+            <!--以下是 go-critic 发现的问题：-->
 
-            #${{ env.reports }}
+            <!-- ${{ env.reports123 }}-->
 
             以下是 go-critic 产生的错误：
 
