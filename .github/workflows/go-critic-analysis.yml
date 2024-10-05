@@ -74,6 +74,7 @@ jobs:
         run: |
           pwd
           ls
+          cat gocritic-report-go.txt
         shell: bash
 
       - name: Create or update issue with analysis results
@@ -86,5 +87,6 @@ jobs:
             The following issues were found by go-critic:
 
             ```
-            $(cat gocritic-report-go.txt)
+            #$(cat gocritic-report-go.txt)
+              cat gocritic-report-helmfile.txt
             ```
