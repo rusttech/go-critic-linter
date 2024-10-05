@@ -5,10 +5,8 @@ on:
   schedule:
     - cron: '0 0 * * *' # 每天运行一次
 
-
 permissions:  # 不然无法把运行结果写在issue的评论里
   issues: write
-
 
 jobs:
   lint:
@@ -56,7 +54,6 @@ jobs:
             cd "$repo_name"
 
             # 运行 go-critic
-            # 没有check-project  这个指令gocritic check-project > ../../gocritic-report-$repo_name.txt || true
             gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
 
             # 返回 repos 目录
@@ -70,11 +67,21 @@ jobs:
           cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
         shell: bash
 
-      - name: 用于调试
+      - name: 读取并保存报告内容
+        id: get-reports
         run: |
-          cat gocritic-report-go.txt
-          pwd
-          ls
+          # 读取不同文件的内容
+          GO_REPORT=$(cat gocritic-report-go.txt || echo "go.txt 没有生成报告")
+          HELMFILE_REPORT=$(cat gocritic-report-helmfile.txt || echo "helmfile.txt 没有生成报告")
+
+          # 设置为环境变量
+          echo "go_report<<EOF" >> $GITHUB_ENV
+          echo "$GO_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "helmfile_report<<EOF" >> $GITHUB_ENV
+          echo "$HELMFILE_REPORT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
         shell: bash
 
       - name: Create or update issue with analysis results
@@ -83,10 +90,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: 1
           body: |
-            ## Go-Critic Static Analysis Report
-            The following issues were found by go-critic:
+            ## Go-Critic 静态分析报告
+            以下是 go-critic 发现的问题：
 
+            ### Go 报告:
             ```
-            #$(cat gocritic-report-go.txt)
-              cat gocritic-report-helmfile.txt
+            ${{ env.go_report }}
+            ```
+
+            ### Helmfile 报告:
+            ```
+            ${{ env.helmfile_report }}
             ```
