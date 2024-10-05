@@ -1,0 +1,84 @@
+name: Go Critic Analysis
+
+on:
+  workflow_dispatch: # 手动触发
+  schedule:
+    - cron: '0 0 * * *' # 每天运行一次
+
+
+permissions:  # 不然无法把运行结果写在issue的评论里
+  issues: write
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Install go-critic
+        run: |
+          go install github.com/go-critic/go-critic/cmd/gocritic@latest
+        shell: bash
+
+      - name: Add Go binaries to PATH
+        run: |
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Debug environment
+        run: |
+          echo "Current shell: $SHELL"
+          echo "Current PATH: $PATH"
+          which mkdir
+        shell: bash
+
+      - name: Read repo.txt and analyze each repository
+        run: |
+          # 创建一个临时目录用于克隆仓库
+          mkdir repos
+          cd repos
+
+          # 循环处理 repo.txt 中的每个仓库
+          while IFS= read -r repo; do
+            echo "Processing $repo"
+            repo_name=$(basename -s .git "$repo")
+
+            # 克隆仓库
+            git clone "$repo" "$repo_name"
+            cd "$repo_name"
+
+            # 运行 go-critic
+            # 没有check-project  这个指令gocritic check-project > ../../gocritic-report-$repo_name.txt || true
+            gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
+
+            # 返回 repos 目录
+            cd ..
+          done < ../repo.txt
+        shell: bash
+
+      - name: Collect analysis reports
+        run: |
+          # 将所有 go-critic 报告合并到一个文件中
+          cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
+        shell: bash
+
+      - name: Create or update issue with analysis results
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: 1
+          body: |
+            ## Go-Critic Static Analysis Report
+            The following issues were found by go-critic:
+
+            ```
+            $(cat gocritic-issues-summary.txt)
+            ```
