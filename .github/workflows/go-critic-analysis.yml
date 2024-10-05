@@ -71,6 +71,11 @@ jobs:
         shell: bash
 
       - name: Create or update issue with analysis results
+        run: |
+          # 用于调试
+          pwd
+          ls
+        shell: bash
         uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -80,5 +85,5 @@ jobs:
             The following issues were found by go-critic:
 
             ```
-            $(cat gocritic-issues-summary.txt)
+            $(cat ../gocritic-issues-summary.txt)
             ```
