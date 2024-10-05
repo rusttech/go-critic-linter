@@ -90,6 +90,8 @@ jobs:
       - name: 输出环境变量进行调试
         run: |
           cat /home/runner/work/go-critic-linter/go-critic-linter/repos/go/README.md
+          echo 123
+          cat /home/runner/work/go-critic-linter/go-critic-linter/repos/go/gocritic-report-go.txt
           echo "Go report: ${{ env.go_report }}"
           echo "Helmfile report: ${{ env.helmfile_report }}"
         shell: bash
