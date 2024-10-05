@@ -52,6 +52,8 @@ jobs:
             # 克隆仓库
             git clone "$repo" "$repo_name"
             cd "$repo_name"
+            pwd
+            ls
 
             # 运行 go-critic
             gocritic check  -disable offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
