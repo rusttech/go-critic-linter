@@ -70,12 +70,13 @@ jobs:
           cat gocritic-report-*.txt > ../gocritic-issues-summary.txt
         shell: bash
 
-      - name: Create or update issue with analysis results
+      - name: 用于调试
         run: |
-          # 用于调试
           pwd
           ls
         shell: bash
+
+      - name: Create or update issue with analysis results
         uses: peter-evans/create-or-update-comment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
