@@ -115,7 +115,7 @@ jobs:
 
             ### Go 报告:
             ```
-            ${{ cat /home/runner/work/go-critic-linter/go-critic-linter/repos/helmfile/CONTRIBUTING.md }}
+              为什么没内容?
             ```
 
             ### Helmfile 报告:
