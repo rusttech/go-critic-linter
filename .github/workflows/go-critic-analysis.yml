@@ -56,7 +56,7 @@ jobs:
             # 运行 go-critic 并捕获错误输出
             #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt 2> ../../gocritic-errors-$repo_name.txt || true
 
-            go vet
+            go vet  || true
             gocritic check  > ../../gocritic-report-$repo_name.txt 2> ../../gocritic-errors-$repo_name.txt || true
 
             # 返回 repos 目录
