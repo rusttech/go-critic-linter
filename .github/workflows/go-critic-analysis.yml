@@ -55,6 +55,8 @@ jobs:
             pwd
             ls
 
+             # 运行 go vet
+            go vet ./...
             # 运行 go-critic
             gocritic check  -disable offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt
             #gocritic check  -disable sloppyTypeAssert,singleCaseSwitch,captLocal,ifElseChain,caseOrder,unslice,commentFormatting,assignOp,exitAfterDefer,elseif,wrapperFunc,unlambda,underef,badCall,dupSubExpr,sloppyLen,offBy1,defaultCaseOrder > ../../gocritic-report-$repo_name.txt || true
